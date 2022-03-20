@@ -4,13 +4,11 @@
 const PhysicalBrowserWifiChecker = {
 
     androidInterface: null,
-    availableNetworks: null,
-    whenScanned: null,
+    networkDataHandler: null,
 
     initialize: function (androidInterface) {
         if (androidInterface == null) {
-            console.error("PhysicalBrowserWifiChecker.initialize: androidInterface is null");
-            return;
+            throw "PhysicalBrowserWifiChecker.initialize: androidInterface is null";
         }
         console.info("PhysicalBrowserWifiChecker.initialize: androidInterface is not null")
         this.androidInterface = androidInterface;
@@ -20,21 +18,19 @@ const PhysicalBrowserWifiChecker = {
         return this.androidInterface != null;
     },
 
-    startScanForAvailableNetworks: function (whenScannedObject) {
+    startScanForAvailableWiFis: function (networkDataHandler) {
         if (!this.androidInterface) {
-            console.error('PhysicalBrowserWifiChecker.startScanForAvailableNetworks: androidInterface is not defined');
-            return;
+            throw "PhysicalBrowserWifiChecker.startScanForAvailableWiFis: androidInterface is not defined";
         }
-        this.whenScanned = whenScannedObject;
+        this.networkDataHandler = networkDataHandler;
         this.androidInterface.startScanForAvailableWiFis();
-        console.info("PhysicalBrowserWifiChecker.startScanForAvailableNetworks: started");
+        console.info("PhysicalBrowserWifiChecker.startScanForAvailableWiFis: started");
     },
 
-    initAvailableNetworks: function (networks) {
-        console.info("PhysicalBrowserWifiChecker.initAvailableNetworks: networks = " + networks);
-        this.availableNetworks = JSON.parse(networks);
-        console.info("PhysicalBrowserWifiChecker.initAvailableNetworks: networks parsed to array with len = " + this.availableNetworks.length);
-        this.whenScanned.initAvailableNetworks(this.availableNetworks);
+    networksAreScanned: function (networkData) {
+        console.info("PhysicalBrowserWifiChecker.networksAreScanned: networks = " + networkData);
+        let parsedNetworkData = JSON.parse(networkData);
+        this.networkDataHandler.networksAreScanned(parsedNetworkData);
     }
 
 };
@@ -43,6 +39,7 @@ const PhysicalBrowserWifiChecker = {
  *   PhysicalBrowserWifiChecker Initialisation
  */
 {
+    console.info("Start process physical-browser-wifi-checker.js");
     try {
         if (typeof androidInterface != "undefined") {
             PhysicalBrowserWifiChecker.initialize(androidInterface);
@@ -50,6 +47,7 @@ const PhysicalBrowserWifiChecker = {
             console.info("Object androidInterface is not defined");
         }
     } catch (e) {
-        console.error('PhysicalBrowserWifiChecker initialisation ERROR: ' + e.toString());
+        console.error("PhysicalBrowserWifiChecker initialisation ERROR: " + e.toString());
     }
+    console.info("End process physical-browser-wifi-checker.js");
 }
